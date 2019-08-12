@@ -1,0 +1,109 @@
+﻿@model ExchangeWeb.Models.TradesVM
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "ViewRazor";
+}
+
+@if (Model != null && Model.Trades != null)
+{
+<div class="container">
+    <h2>Razor page</h2>
+    <div class="row mb-2">
+        <div id="chart_div"></div>
+    </div>
+    <div id="table-wrapper">
+        <table class="table table-dark table-hover">
+            <tr>
+                <th>
+                    Цена
+                </th>
+                <th>
+                    Объём
+                </th>
+                <th>
+                    Время сделки
+                </th>
+                <th>
+                    Продавец
+                </th>
+                <th>
+                    Покупатель
+                </th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model.Trades)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Volume)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TransactionTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SellerName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CustomerName)
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
+
+
+    @section scripts  {
+        <!--Load the AJAX API-->
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+        // google charts
+        try {
+                google.charts.load('current', { 'packages': ['corechart'] });
+                google.charts.setOnLoadCallback(drawChart);
+
+                function drawChart() {
+                    var maxPrice = @Model.Trades.Max(t => t.Price);
+                    var data = new google.visualization.DataTable();
+                    data.addColumn('date', 'Дата');
+                    data.addColumn('number', 'Цена');
+                    var tradesData = @Html.Raw(Model.jsonTrades);
+                    var convertedTradesData = tradesData.map(function (name) {
+                        return [new Date(name.transactionTime), name.price];
+                    });
+
+                    data.addRows(convertedTradesData);
+
+                    var options = {
+                        title: 'Зависимость цены от времени',
+                        //width: 900,
+                        //height: 500,
+                        hAxis: {
+                            format: 'dd/MM/yyyy',
+                            gridlines: { count: maxPrice }
+                        },
+                        vAxis: {
+                            gridlines: { color: 'none' },
+                            minValue: 0
+                        }
+                };
+
+                var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+                chart.draw(data, options);
+            }
+        } catch (e) {
+            console.error(e.message);
+        }
+        </script>
+    }
+}
+else
+{
+    <p>Не удалось загрузить модель</p>
+}

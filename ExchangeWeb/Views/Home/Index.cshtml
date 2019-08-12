@@ -1,0 +1,33 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Home Page Of The Exchange";
+}
+
+<div class="jumbotron">
+    <h1>Currency Exchange</h1>
+    <p class="lead"></p>
+    <div class="btn-group-vertical">
+        <a href="/razor" class="btn btn-primary btn-lg">View Razor Page &raquo;</a>
+        <a href="/ajax" class="btn btn-primary btn-lg">View Ajax Page &raquo;</a>
+    </div>
+</div>
+
+<table class="mt-3 table table-hover table-dark">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Валюта</th>
+            <th scope="col">Курс</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var cur in ViewBag.Currencies)
+        {
+            <tr>
+                <th scope="row">1</th>
+                <th>@cur.Name</th>
+                <td>@cur.Rate</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,41 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "ViewAjax";
+}
+
+<div class="container">
+    <h2>Ajax Page</h2>
+    <div class="row mb-2">
+        <div id="chart_div"></div>
+    </div>
+    <div id="table-wrapper">
+        <table class="table table-dark table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        Цена
+                    </th>
+                    <th>
+                        Объём
+                    </th>
+                    <th>
+                        Время сделки
+                    </th>
+                    <th>
+                        Продавец
+                    </th>
+                    <th>
+                        Покупатель
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+@section scripts {
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    @Scripts.Render("~/bundles/viewajax")
+}
