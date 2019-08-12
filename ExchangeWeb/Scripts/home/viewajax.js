@@ -2,19 +2,21 @@
 
 $(document).ready(function () {
     var parsedData = null;
+    var maxPrice = null;
     $.ajax({
         url: '/ajaxtrades',
         type: 'post',
         success: function (data) {
             try {
                 if (!data.error) {
+                    maxPrice = data.maxPrice;
                     parsedData = JSON.parse(data.trades);
                     // create table data
                     parsedData.forEach(function (item, i, arr) {
                         // set price
                         var tr = document.createElement('tr');
                         var pricetd = document.createElement("td");
-                        pricetd.innerText = item.price + 'BYN';
+                        pricetd.innerText = item.price + ' BYN';
                         tr.appendChild(pricetd);
                         // set volume
                         var volumetd = document.createElement("td");
@@ -33,6 +35,9 @@ $(document).ready(function () {
                         customerNametd.innerText = item.customerName;
                         tr.appendChild(customerNametd);
                         document.getElementsByTagName('tbody')[0].appendChild(tr);
+                        // load chart
+                        google.charts.load('current', { 'packages': ['corechart'] });
+                        google.charts.setOnLoadCallback(drawChart);                      
                     }); 
                 }
                 else {
@@ -49,25 +54,23 @@ $(document).ready(function () {
         }
     });
 
-    function drawChart(parsedData) {
+    function drawChart() {
         try {
-            var maxPrice = parsedData.maxPrice;
-            var data = new google.visualization.DataTable();
-            data.addColumn('date', 'Дата');
-            data.addColumn('number', 'Цена');
-            var convertedTradesData = parsedData.trades.map(function (name) {
+            var max = maxPrice;
+            var dataForChart = new google.visualization.DataTable();
+            dataForChart.addColumn('date', 'Дата');
+            dataForChart.addColumn('number', 'Цена');
+            var convertedTradesData = parsedData.map(function (name) {
                 return [new Date(name.transactionTime), name.price];
             });
 
-            data.addRows(convertedTradesData);
+            dataForChart.addRows(convertedTradesData);
 
             var options = {
                 title: 'Зависимость цены от времени',
-                //width: 900,
-                //height: 500,
                 hAxis: {
                     format: 'dd/MM/yyyy',
-                    gridlines: { count: maxPrice }
+                    gridlines: { count: max }
                 },
                 vAxis: {
                     gridlines: { color: 'none' },
@@ -76,17 +79,9 @@ $(document).ready(function () {
             };
 
             var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-            chart.draw(data, options);
+            chart.draw(dataForChart, options);
         } catch (error) {
             console.error(error.message);
         }
     }
-
-    setTimeout(function () {
-        // load chart
-        if (parsedData != null) {
-            google.charts.load('current', { 'packages': ['corechart'] });
-            google.charts.setOnLoadCallback(drawChart(parsedData));
-        }
-    }, 1000);
 });
